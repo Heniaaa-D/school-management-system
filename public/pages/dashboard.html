@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School MS — Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', 'Segoe UI', sans-serif; }
+  .display { font-family: 'Poppins', 'Segoe UI', sans-serif; }
+  .nav-item.active { background: rgba(0,0,0,.25); border-left: 3px solid white; }
+  .nav-item:hover { background: rgba(0,0,0,.15); }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+</style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Sidebar -->
+  <aside class="fixed inset-y-0 left-0 w-60 bg-red-700 text-white flex flex-col z-20">
+    <div class="px-5 py-5 border-b border-white/10">
+      <p class="display font-bold text-lg leading-tight">School MS</p>
+      <p class="text-xs text-red-100/80">EduManage System</p>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-2 text-sm" id="nav-list"></nav>
+    <div class="p-3 border-t border-white/10">
+      <button id="logout-btn" class="w-full bg-black/20 hover:bg-black/30 rounded-lg py-2 text-sm font-medium transition">Log Out</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="ml-60 min-h-screen flex flex-col">
+    <header class="bg-white shadow-sm px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+      <div>
+        <h1 id="page-title" class="display text-xl font-bold text-gray-800">Dashboard</h1>
+        <p id="page-subtitle" class="text-gray-400 text-xs mt-0.5">Overview of your school</p>
+      </div>
+      <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full pl-1 pr-3 py-1">
+        <div class="w-7 h-7 rounded-full bg-red-700 text-white flex items-center justify-center text-xs font-bold" id="user-initial">A</div>
+        <div class="text-right leading-tight">
+          <p class="text-xs font-semibold text-gray-700" id="user-name">—</p>
+          <p class="text-[10px] uppercase tracking-wide text-red-700 font-medium" id="user-role">—</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="p-6 flex-1">
+
+      <!-- DASHBOARD -->
+      <section id="section-dashboard" class="space-y-6">
+        <div id="stat-cards" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        <div class="grid lg:grid-cols-2 gap-6">
+          <div class="bg-white rounded-xl border border-gray-200">
+            <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h2 class="font-semibold text-gray-800">Recent Students</h2>
+            </div>
+            <table class="w-full text-sm"><tbody id="recent-students"></tbody></table>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200">
+            <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h2 class="font-semibold text-gray-800">Recent Grades</h2>
+            </div>
+            <table class="w-full text-sm"><tbody id="recent-grades"></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- STUDENTS -->
+      <section id="section-students" class="hidden space-y-4">
+        <div class="flex items-center justify-between gap-3">
+          <input id="students-search" placeholder="Search by name or code…" class="border border-gray-300 focus:border-red-600 rounded-lg px-3 py-2 text-sm w-72 outline-none">
+          <button id="students-add-btn" class="bg-red-700 hover:bg-red-800 text-white text-sm font-medium rounded-lg px-4 py-2">+ Add Student</button>
+        </div>
+        <div id="students-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+          <table class="w-full text-sm whitespace-nowrap">
+            <thead class="bg-red-50 text-red-700 text-xs uppercase">
+              <tr>
+                <th class="text-left px-4 py-3">Code</th><th class="text-left px-4 py-3">Name</th>
+                <th class="text-left px-4 py-3">Email</th><th class="text-left px-4 py-3">Grade</th>
+                <th class="text-left px-4 py-3">Section</th><th class="text-left px-4 py-3">Parent</th>
+                <th class="text-left px-4 py-3">Status</th><th class="text-left px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="students-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TEACHERS -->
+      <section id="section-teachers" class="hidden space-y-4">
+        <div class="flex items-center justify-between gap-3">
+          <input id="teachers-search" placeholder="Search by name or subject…" class="border border-gray-300 focus:border-red-600 rounded-lg px-3 py-2 text-sm w-72 outline-none">
+          <button id="teachers-add-btn" class="bg-red-700 hover:bg-red-800 text-white text-sm font-medium rounded-lg px-4 py-2">+ Add Teacher</button>
+        </div>
+        <div id="teachers-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+          <table class="w-full text-sm whitespace-nowrap">
+            <thead class="bg-red-50 text-red-700 text-xs uppercase">
+              <tr>
+                <th class="text-left px-4 py-3">Code</th><th class="text-left px-4 py-3">Name</th>
+                <th class="text-left px-4 py-3">Email</th><th class="text-left px-4 py-3">Phone</th>
+                <th class="text-left px-4 py-3">Subject</th><th class="text-left px-4 py-3">Status</th>
+                <th class="text-left px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="teachers-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- COURSES -->
+      <section id="section-courses" class="hidden space-y-4">
+        <div class="flex items-center justify-between gap-3">
+          <input id="courses-search" placeholder="Search courses…" class="border border-gray-300 focus:border-red-600 rounded-lg px-3 py-2 text-sm w-72 outline-none">
+          <button id="courses-add-btn" class="bg-red-700 hover:bg-red-800 text-white text-sm font-medium rounded-lg px-4 py-2">+ Add Course</button>
+        </div>
+        <div id="courses-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+          <table class="w-full text-sm whitespace-nowrap">
+            <thead class="bg-red-50 text-red-700 text-xs uppercase">
+              <tr>
+                <th class="text-left px-4 py-3">Code</th><th class="text-left px-4 py-3">Course Name</th>
+                <th class="text-left px-4 py-3">Teacher</th><th class="text-left px-4 py-3">Grade</th>
+                <th class="text-left px-4 py-3">Credits</th><th class="text-left px-4 py-3">Status</th>
+                <th class="text-left px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="courses-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- GRADES -->
+      <section id="section-grades" class="hidden space-y-4">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="flex gap-2 flex-wrap">
+            <select id="grades-filter-student" class="border border-gray-300 rounded-lg px-3 py-2 text-sm"><option value="">All Students</option></select>
+            <select id="grades-filter-course" class="border border-gray-300 rounded-lg px-3 py-2 text-sm"><option value="">All Courses</option></select>
+          </div>
+          <button id="grades-add-btn" class="hidden bg-red-700 hover:bg-red-800 text-white text-sm font-medium rounded-lg px-4 py-2">+ Add Grade</button>
+        </div>
+        <div id="grades-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+          <table class="w-full text-sm whitespace-nowrap">
+            <thead class="bg-red-50 text-red-700 text-xs uppercase">
+              <tr>
+                <th class="text-left px-4 py-3">Student</th><th class="text-left px-4 py-3">Course</th>
+                <th class="text-left px-4 py-3">Semester</th><th class="text-left px-4 py-3">Score</th>
+                <th class="text-left px-4 py-3">Letter</th><th class="text-left px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="grades-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ATTENDANCE -->
+      <section id="section-attendance" class="hidden space-y-4">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="flex gap-2 flex-wrap">
+            <select id="attendance-filter-course" class="border border-gray-300 rounded-lg px-3 py-2 text-sm"><option value="">All Courses</option></select>
+            <input id="attendance-filter-date" type="date" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+          </div>
+          <button id="attendance-add-btn" class="hidden bg-red-700 hover:bg-red-800 text-white text-sm font-medium rounded-lg px-4 py-2">+ Add Record</button>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+          <table class="w-full text-sm whitespace-nowrap">
+            <thead class="bg-red-50 text-red-700 text-xs uppercase">
+              <tr>
+                <th class="text-left px-4 py-3">Student</th><th class="text-left px-4 py-3">Course</th>
+                <th class="text-left px-4 py-3">Date</th><th class="text-left px-4 py-3">Status</th>
+                <th class="text-left px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="attendance-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SCHEDULE -->
+      <section id="section-schedule" class="hidden space-y-4">
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="font-semibold text-gray-700">Weekly Schedule</h2>
+          <button id="schedule-add-btn" class="hidden bg-red-700 hover:bg-red-800 text-white text-sm font-medium rounded-lg px-4 py-2">+ Add Entry</button>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+          <table class="w-full text-sm whitespace-nowrap">
+            <thead class="bg-red-50 text-red-700 text-xs uppercase">
+              <tr>
+                <th class="text-left px-4 py-3">Day</th><th class="text-left px-4 py-3">Time</th>
+                <th class="text-left px-4 py-3">Course</th><th class="text-left px-4 py-3">Teacher</th>
+                <th class="text-left px-4 py-3">Room</th><th class="text-left px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="schedule-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="section-settings" class="hidden space-y-4">
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+          <h2 class="font-semibold text-gray-800 mb-3">Application Information</h2>
+          <dl class="grid grid-cols-2 gap-3 text-sm">
+            <div><dt class="text-gray-400">App Name</dt><dd class="font-medium">School Management System</dd></div>
+            <div><dt class="text-gray-400">Version</dt><dd class="font-medium">2.0.0</dd></div>
+            <div><dt class="text-gray-400">Storage</dt><dd class="font-medium">SQLite via Node.js / Express API</dd></div>
+            <div><dt class="text-gray-400">Signed in as</dt><dd class="font-medium" id="settings-user">—</dd></div>
+          </dl>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Generic modal -->
+  <div id="modal-backdrop" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-30 p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h3 id="modal-title" class="font-semibold text-gray-800">Add Record</h3>
+        <button id="modal-close" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+      </div>
+      <form id="modal-form" class="p-5 space-y-4"></form>
+    </div>
+  </div>
+
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
